@@ -1,0 +1,2 @@
+rootProject.name = 'esport'
+ext['spring-security.version']='5.6.2'
