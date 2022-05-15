@@ -19,9 +19,16 @@ public class DUserServiceImpl implements DUserService {
 	private final BCryptPasswordEncoder encoder;
 
 	@Override
-	public DUserEntity addUserPassword(UserEntity user, String password) {
+	public DUserEntity addUserPassword(long userId, String password) {
 		String encodedPassword = encoder.encode(password);
+		UserEntity user = UserEntity.builder().id(userId).build();
 		DUserEntity dUser = new DUserEntity(user, encodedPassword);
 		return dUserRepository.save(dUser);
+	}
+
+	@Override
+	public boolean validateUserPassword(long userId, String password) {
+		DUserEntity dUserEntity = dUserRepository.findByUserId(userId).orElseThrow();
+		return encoder.matches(password, dUserEntity.getPassword());
 	}
 }

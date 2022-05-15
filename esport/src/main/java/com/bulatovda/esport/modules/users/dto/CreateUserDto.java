@@ -13,8 +13,8 @@ public class CreateUserDto extends AbstractUserDto {
 	@ValidPassword
 	private String password;
 
-	public CreateUserDto(String email) {
-		super(email, email);
-
+	public CreateUserDto(String username, String password) {
+		super(username);
+		this.password = password;
 	}
 }

@@ -1,24 +1,25 @@
 package com.bulatovda.esport.configs;
 
+import com.bulatovda.esport.modules.security.JwtTokenFilterConfigurer;
+import com.bulatovda.esport.modules.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-//	@Bean
-//	public UserDetailsService userDetailsService() {
-//		return new CustomUserDetailsService();
-//	}
+	private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -40,10 +41,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeRequests()
-				.antMatchers(HttpMethod.POST, "/api/v1/users")
-				.authenticated()
-				.anyRequest().permitAll()
-				.and().exceptionHandling().accessDeniedPage("/403");
+		httpSecurity.csrf().disable();
+		httpSecurity.cors().disable();
+
+		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+		// Entry points
+		httpSecurity.authorizeRequests()//
+				.antMatchers("/api/v1/users/signup").permitAll()// signup (registration)
+				.antMatchers("/api/v1/users/signin").permitAll()// signin (login)
+				.antMatchers("/swagger-ui/**").permitAll()//
+				.antMatchers("/v3/api-docs/**").permitAll()//
+				.anyRequest().authenticated()
+				.and().exceptionHandling().accessDeniedPage("/signup"); // signup
+
+		httpSecurity.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
+	}
+
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 	}
 }

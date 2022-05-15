@@ -13,10 +13,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public abstract class AbstractUserDto {
 	@NotNull
-	@Email(message = "That is not a valid email address", regexp = ".+@.+\\..+")
-	private String email;
-
-	@NotNull
 	@Size(min = 2, max = 30)
 	private String username;
 }

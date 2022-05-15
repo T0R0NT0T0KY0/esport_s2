@@ -10,17 +10,19 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserDto extends AbstractUserDto {
 	private long userId;
+
+	private String username;
 
 	private LocalDateTime createdAt;
 
 	private LocalDateTime updatedAt;
 
 	public UserDto(UserEntity user) {
-		super(user.getEmail(), user.getUsername());
+		super(user.getUsername());
 		this.userId = user.getId();
+		this.username = user.getUsername();
 		this.createdAt = user.getCreatedAt();
 		this.updatedAt = user.getUpdatedAt();
 	}
